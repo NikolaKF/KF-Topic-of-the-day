@@ -4,7 +4,10 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Knight Frank – Topic of the Day</title>
+
+  <!-- Supabase -->
   <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+
   <style>
     :root{
       --kf-red:#e30613;
@@ -13,248 +16,945 @@
       --line:#e9e9e9;
       --bg:#fff;
     }
+
     *{box-sizing:border-box}
-    html,body{margin:0;width:100%;height:100%;font-family:Arial,Helvetica,sans-serif;background:var(--bg);color:var(--ink)}
-    body{overflow:hidden}
-    .app{height:100vh;display:flex;flex-direction:column;align-items:center;padding:34px 42px}
-    header{width:100%;max-width:1280px;display:flex;align-items:flex-start;justify-content:space-between}
-    .logo img{width:185px;height:auto;display:block}
-    .date{font-size:15px;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-top:7px}
-    main{width:100%;max-width:1120px;flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
-    .eyebrow{font-size:17px;letter-spacing:.22em;text-transform:uppercase;color:var(--kf-red);font-weight:700;margin-bottom:28px}
-    h1{font-size:clamp(34px,4.1vw,68px);line-height:1.08;max-width:1000px;margin:0 auto 48px;font-weight:600;letter-spacing:-.025em}
-    .answers{display:flex;gap:22px;width:min(760px,100%);justify-content:center}
-    button.answer{
-      flex:1;min-height:94px;border:1px solid #171717;background:#fff;color:#171717;
-      font-size:clamp(21px,2vw,30px);font-weight:700;letter-spacing:.04em;cursor:pointer;
-      transition:.18s ease;padding:18px 24px
+
+    html,body{
+      margin:0;
+      width:100%;
+      height:100%;
+      font-family:Arial,Helvetica,sans-serif;
+      background:var(--bg);
+      color:var(--ink)
     }
-    button.answer:hover{background:#171717;color:#fff;transform:translateY(-2px)}
-    button.answer:disabled{opacity:.55;cursor:wait;transform:none}
-    .hint{margin-top:22px;color:#999;font-size:14px}
-    .result{width:min(1180px,100%);display:none}
-    .result h2{font-size:clamp(30px,3.3vw,52px);margin:0 0 38px}
-    .result-grid{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(320px,.65fr);gap:56px;align-items:start}
-    .bars{display:grid;gap:24px;text-align:left}
-    .row{display:grid;grid-template-columns:190px 1fr 70px;align-items:center;gap:18px}
-    .label{font-size:20px;font-weight:700}
-    .track{height:26px;background:#eee;overflow:hidden}
-    .fill{height:100%;background:var(--kf-red);width:0;transition:width .6s ease}
-    .pct{text-align:right;font-size:20px;font-weight:700}
-    .total{margin-top:18px;color:var(--muted);font-size:14px;text-align:right}
-    .fact{margin:0;padding:30px;border:1px solid var(--line);border-radius:18px;background:#fafafa;min-height:180px}
-    .fact-title{font-size:14px;letter-spacing:.18em;text-transform:uppercase;color:var(--kf-red);font-weight:700;margin-bottom:10px}
-    .fact p{margin:0;font-size:19px;line-height:1.5}
-    .empty{display:none;text-align:center}
-    .empty h2{font-size:42px;margin:0 0 12px}
-    .empty p{font-size:19px;color:var(--muted)}
-    .error{display:none;max-width:800px;text-align:center}
-    .error h2{font-size:34px}
-    .error p{color:#666;line-height:1.5}
-    .footer{font-size:12px;color:#aaa;letter-spacing:.08em;text-transform:uppercase}
+
+    body{overflow:hidden}
+
+    .app{
+      height:100vh;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      padding:34px 42px
+    }
+
+    header{
+      width:100%;
+      max-width:1280px;
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between
+    }
+
+    .logo img{
+      width:185px;
+      height:auto;
+      display:block
+    }
+
+    .date{
+      font-size:15px;
+      color:var(--muted);
+      letter-spacing:.08em;
+      text-transform:uppercase;
+      margin-top:7px
+    }
+
+    main{
+      width:100%;
+      max-width:1120px;
+      flex:1;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      text-align:center
+    }
+
+    .eyebrow{
+      font-size:17px;
+      letter-spacing:.22em;
+      text-transform:uppercase;
+      color:var(--kf-red);
+      font-weight:700;
+      margin-bottom:28px
+    }
+
+    h1{
+      font-size:clamp(34px,4.1vw,68px);
+      line-height:1.08;
+      max-width:1000px;
+      margin:0 auto 48px;
+      font-weight:600;
+      letter-spacing:-.025em
+    }
+
+    .answers{
+      display:flex;
+      gap:22px;
+      width:min(760px,100%);
+      justify-content:center
+    }
+
+    button.answer{
+      flex:1;
+      min-height:94px;
+      border:1px solid #171717;
+      background:#fff;
+      color:#171717;
+      font-size:clamp(21px,2vw,30px);
+      font-weight:700;
+      letter-spacing:.04em;
+      cursor:pointer;
+      transition:.18s ease;
+      padding:18px 24px
+    }
+
+    button.answer:hover{
+      background:#171717;
+      color:#fff;
+      transform:translateY(-2px)
+    }
+
+    button.answer:disabled{
+      opacity:.55;
+      cursor:wait;
+      transform:none
+    }
+
+    .hint{
+      margin-top:22px;
+      color:#999;
+      font-size:14px
+    }
+
+    .result{
+      width:min(1180px,100%);
+      display:none
+    }
+
+    .result h2{
+      font-size:clamp(30px,3.3vw,52px);
+      margin:0 0 38px
+    }
+
+    .result-grid{
+      display:grid;
+      grid-template-columns:minmax(0,1.35fr) minmax(320px,.65fr);
+      gap:56px;
+      align-items:start
+    }
+
+    .bars{
+      display:grid;
+      gap:24px;
+      text-align:left
+    }
+
+    .row{
+      display:grid;
+      grid-template-columns:190px 1fr 70px;
+      align-items:center;
+      gap:18px
+    }
+
+    .label{
+      font-size:20px;
+      font-weight:700
+    }
+
+    .track{
+      height:26px;
+      background:#eee;
+      overflow:hidden
+    }
+
+    .fill{
+      height:100%;
+      background:var(--kf-red);
+      width:0;
+      transition:width .6s ease
+    }
+
+    .pct{
+      text-align:right;
+      font-size:20px;
+      font-weight:700
+    }
+
+    .total{
+      margin-top:18px;
+      color:var(--muted);
+      font-size:14px;
+      text-align:right
+    }
+
+    .fact{
+      margin:0;
+      padding:30px;
+      border:1px solid var(--line);
+      border-radius:18px;
+      background:#fafafa;
+      min-height:180px
+    }
+
+    .fact-title{
+      font-size:14px;
+      letter-spacing:.18em;
+      text-transform:uppercase;
+      color:var(--kf-red);
+      font-weight:700;
+      margin-bottom:10px
+    }
+
+    .fact p{
+      margin:0;
+      font-size:19px;
+      line-height:1.5
+    }
+
+    .empty{
+      display:none;
+      text-align:center
+    }
+
+    .empty h2{
+      font-size:42px;
+      margin:0 0 12px
+    }
+
+    .empty p{
+      font-size:19px;
+      color:var(--muted)
+    }
+
+    .error{
+      display:none;
+      max-width:800px;
+      text-align:center
+    }
+
+    .error h2{
+      font-size:34px
+    }
+
+    .error p{
+      color:#666;
+      line-height:1.5;
+      word-break:break-word
+    }
+
+    .diagnostic{
+      margin-top:20px;
+      font-size:13px;
+      color:#999;
+      max-width:900px;
+      word-break:break-word
+    }
+
+    .footer{
+      font-size:12px;
+      color:#aaa;
+      letter-spacing:.08em;
+      text-transform:uppercase
+    }
+
     @media(max-width:700px){
-      .app{padding:22px 18px}.logo img{width:145px}.date{font-size:11px}
-      .answers{flex-direction:column}.row{grid-template-columns:1fr 65px}.label{grid-column:1/2}.track{grid-column:1/2}.pct{grid-column:2/3;grid-row:1/3}
-      .result-grid{grid-template-columns:1fr;gap:30px}.fact{margin-top:0}.fact p{font-size:16px}
+      .app{
+        padding:22px 18px
+      }
+
+      .logo img{
+        width:145px
+      }
+
+      .date{
+        font-size:11px
+      }
+
+      .answers{
+        flex-direction:column
+      }
+
+      .row{
+        grid-template-columns:1fr 65px
+      }
+
+      .label{
+        grid-column:1/2
+      }
+
+      .track{
+        grid-column:1/2
+      }
+
+      .pct{
+        grid-column:2/3;
+        grid-row:1/3
+      }
+
+      .result-grid{
+        grid-template-columns:1fr;
+        gap:30px
+      }
+
+      .fact{
+        margin-top:0
+      }
+
+      .fact p{
+        font-size:16px
+      }
     }
   </style>
 </head>
+
 <body>
+
 <div class="app">
+
   <header>
-    <div class="logo"><img src="kf.png" alt="Knight Frank"></div>
+    <div class="logo">
+      <img src="kf.png" alt="Knight Frank">
+    </div>
+
     <div class="date" id="date"></div>
   </header>
 
   <main>
+
     <section id="questionView">
+
       <div class="eyebrow">Topic of the Day</div>
+
       <h1 id="question">Loading…</h1>
+
       <div class="answers">
+
         <button class="answer" id="answerA"></button>
+
         <button class="answer" id="answerB"></button>
+
       </div>
-      <div class="hint">Choose your answer</div>
+
+      <div class="hint">
+        Choose your answer
+      </div>
+
     </section>
+
 
     <section id="resultView" class="result">
+
       <div class="eyebrow">Topic of the Day</div>
+
       <h2>Today's result</h2>
+
       <div class="bars">
+
         <div class="row">
+
           <div class="label" id="labelA"></div>
-          <div class="track"><div class="fill" id="fillA"></div></div>
+
+          <div class="track">
+            <div class="fill" id="fillA"></div>
+          </div>
+
           <div class="pct" id="pctA">0%</div>
+
         </div>
+
+
         <div class="row">
+
           <div class="label" id="labelB"></div>
-          <div class="track"><div class="fill" id="fillB"></div></div>
+
+          <div class="track">
+            <div class="fill" id="fillB"></div>
+          </div>
+
           <div class="pct" id="pctB">0%</div>
+
         </div>
+
       </div>
+
       <div class="total" id="totalVotes"></div>
+
       <div class="fact">
-        <div class="fact-title">Fun fact</div>
-          <p id="funFact"></p>
+
+        <div class="fact-title">
+          Fun fact
         </div>
+
+        <p id="funFact"></p>
+
       </div>
+
     </section>
+
 
     <section id="emptyView" class="empty">
+
       <h2>No topic today.</h2>
-      <p>See you on the next working day.</p>
+
+      <p>
+        See you on the next working day.
+      </p>
+
     </section>
+
 
     <section id="errorView" class="error">
+
       <h2>Something went wrong.</h2>
+
       <p id="errorText"></p>
+
+      <div class="diagnostic" id="diagnosticText"></div>
+
     </section>
+
   </main>
 
-  <div class="footer">Knight Frank · Topic of the Day</div>
+
+  <div class="footer">
+    Knight Frank · Topic of the Day
+  </div>
+
 </div>
 
+
 <script>
+
   // ==========================================================
-  // 1) PASTE YOUR SUPABASE DETAILS HERE
-  //    Do NOT paste a secret/service_role key.
+  // SUPABASE SETTINGS
   // ==========================================================
+  // KEEP YOUR CURRENT TWO LINES HERE EXACTLY AS THEY ARE.
+  // ==========================================================
+
   const SUPABASE_URL = "https://qwwxdccvpbbrkfljozzx.supabase.co";
   const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_8IM0CuMbcb8EDEh8fZyKcg_eM4sJhyv";
 
-  const { createClient } = supabase;
-  const db = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
 
   let currentQuestion = null;
   let resultTimer = null;
 
   const $ = (id) => document.getElementById(id);
 
-  function localDateISO() {
-    const now = new Date();
-    const y = now.getFullYear();
-    const m = String(now.getMonth()+1).padStart(2,'0');
-    const d = String(now.getDate()).padStart(2,'0');
-    return `${y}-${m}-${d}`;
+
+  // ==========================================================
+  // DIAGNOSTICS
+  // ==========================================================
+
+  function diagnostic(message) {
+
+    console.log("[KF Topic of the Day]", message);
+
+    const diagnosticBox = $("diagnosticText");
+
+    if (diagnosticBox) {
+      diagnosticBox.textContent = message;
+    }
   }
+
+
+  window.addEventListener("error", function(event) {
+
+    console.error(event.error || event.message);
+
+    diagnostic(
+      "JavaScript error: " +
+      (event.message || "Unknown error")
+    );
+
+  });
+
+
+  window.addEventListener("unhandledrejection", function(event) {
+
+    console.error(event.reason);
+
+    diagnostic(
+      "Promise error: " +
+      (event.reason?.message || event.reason || "Unknown error")
+    );
+
+  });
+
+
+  // ==========================================================
+  // CHECK SUPABASE LIBRARY
+  // ==========================================================
+
+  if (typeof supabase === "undefined") {
+
+    $("question").textContent = "Supabase did not load.";
+
+    diagnostic(
+      "The Supabase JavaScript library could not be loaded on this device."
+    );
+
+    showOnly("errorView");
+
+  }
+
+
+  // ==========================================================
+  // CREATE SUPABASE CLIENT
+  // ==========================================================
+
+  let db = null;
+
+  try {
+
+    if (typeof supabase !== "undefined") {
+
+      const { createClient } = supabase;
+
+      db = createClient(
+        SUPABASE_URL,
+        SUPABASE_PUBLISHABLE_KEY
+      );
+
+      diagnostic("Supabase library loaded successfully.");
+
+    }
+
+  } catch (error) {
+
+    showOnly("errorView");
+
+    $("errorText").textContent =
+      "Supabase initialization failed.";
+
+    diagnostic(
+      error.message || String(error)
+    );
+
+  }
+
+
+  // ==========================================================
+  // DATE
+  // ==========================================================
+
+  function localDateISO() {
+
+    const now = new Date();
+
+    const y = now.getFullYear();
+
+    const m = String(
+      now.getMonth() + 1
+    ).padStart(2, "0");
+
+    const d = String(
+      now.getDate()
+    ).padStart(2, "0");
+
+    return `${y}-${m}-${d}`;
+
+  }
+
+
+  // ==========================================================
+  // SHOW VIEW
+  // ==========================================================
 
   function showOnly(id) {
-    ["questionView","resultView","emptyView","errorView"].forEach(x => {
-      $(x).style.display = x === id ? (x === "questionView" ? "block" : "block") : "none";
+
+    [
+      "questionView",
+      "resultView",
+      "emptyView",
+      "errorView"
+    ].forEach(x => {
+
+      $(x).style.display =
+        x === id ? "block" : "none";
+
     });
+
   }
+
+
+  // ==========================================================
+  // DATE DISPLAY
+  // ==========================================================
 
   function formatDate() {
-    $("date").textContent = new Intl.DateTimeFormat("en-GB", {
-      weekday:"long", day:"numeric", month:"long", year:"numeric"
-    }).format(new Date());
+
+    $("date").textContent =
+      new Intl.DateTimeFormat("en-GB", {
+
+        weekday: "long",
+        day: "numeric",
+        month: "long",
+        year: "numeric"
+
+      }).format(new Date());
+
   }
 
+
+  // ==========================================================
+  // LOAD TODAY
+  // ==========================================================
+
   async function loadToday() {
+
     formatDate();
 
-    if (!SUPABASE_URL.startsWith("https://") || SUPABASE_PUBLISHABLE_KEY.startsWith("PASTE_")) {
+    if (!db) {
+
       showOnly("errorView");
-      $("errorText").textContent = "Supabase is not configured yet. Open index.html and paste your Project URL and Publishable key in the two marked fields.";
+
+      $("errorText").textContent =
+        "Supabase connection is not available.";
+
+      diagnostic(
+        "The Supabase client could not be created."
+      );
+
       return;
+
     }
+
 
     const today = localDateISO();
 
-    const { data, error } = await db
-      .from("questions")
-      .select("id, question_date, question, answer_a, answer_b, fun_fact")
-      .eq("question_date", today)
-      .eq("active", true)
-      .maybeSingle();
+    diagnostic(
+      "Supabase loaded. Loading question for " + today
+    );
 
-    if (error) {
+
+    try {
+
+      const {
+        data,
+        error
+      } = await db
+
+        .from("questions")
+
+        .select(
+          "id, question_date, question, answer_a, answer_b, fun_fact"
+        )
+
+        .eq("question_date", today)
+
+        .eq("active", true)
+
+        .maybeSingle();
+
+
+      if (error) {
+
+        showOnly("errorView");
+
+        $("errorText").textContent =
+          "Supabase returned an error.";
+
+        diagnostic(
+          "Database error: " + error.message
+        );
+
+        return;
+
+      }
+
+
+      if (!data) {
+
+        showOnly("emptyView");
+
+        diagnostic(
+          "Supabase connected, but there is no active question for " +
+          today
+        );
+
+        return;
+
+      }
+
+
+      currentQuestion = data;
+
+
+      $("question").textContent =
+        data.question;
+
+      $("answerA").textContent =
+        data.answer_a;
+
+      $("answerB").textContent =
+        data.answer_b;
+
+
+      $("answerA").disabled = false;
+
+      $("answerB").disabled = false;
+
+
+      diagnostic(
+        "Question loaded successfully."
+      );
+
+
+      showOnly("questionView");
+
+
+    } catch (error) {
+
       showOnly("errorView");
-      $("errorText").textContent = error.message;
-      return;
+
+      $("errorText").textContent =
+        "Could not load today's question.";
+
+      diagnostic(
+        "Request failed: " +
+        (error.message || String(error))
+      );
+
     }
 
-    if (!data) {
-      showOnly("emptyView");
-      return;
-    }
-
-    currentQuestion = data;
-    $("question").textContent = data.question;
-    $("answerA").textContent = data.answer_a;
-    $("answerB").textContent = data.answer_b;
-    $("answerA").disabled = false;
-    $("answerB").disabled = false;
-    showOnly("questionView");
   }
+
+
+  // ==========================================================
+  // VOTE
+  // ==========================================================
 
   async function vote(answer) {
-    if (!currentQuestion) return;
+
+    if (!currentQuestion || !db)
+      return;
+
 
     $("answerA").disabled = true;
+
     $("answerB").disabled = true;
 
-    const { error } = await db.from("votes").insert({
-      question_id: currentQuestion.id,
-      answer
-    });
 
-    if (error) {
-      $("answerA").disabled = false;
-      $("answerB").disabled = false;
+    try {
+
+      const { error } =
+        await db
+
+          .from("votes")
+
+          .insert({
+
+            question_id:
+              currentQuestion.id,
+
+            answer
+
+          });
+
+
+      if (error) {
+
+        $("answerA").disabled = false;
+
+        $("answerB").disabled = false;
+
+        showOnly("errorView");
+
+        $("errorText").textContent =
+          "Vote could not be saved.";
+
+        diagnostic(
+          "Vote error: " + error.message
+        );
+
+        return;
+
+      }
+
+
+      await showResults();
+
+
+    } catch (error) {
+
       showOnly("errorView");
-      $("errorText").textContent = error.message;
-      return;
+
+      $("errorText").textContent =
+        "Vote could not be saved.";
+
+      diagnostic(
+        "Vote request failed: " +
+        (error.message || String(error))
+      );
+
     }
 
-    await showResults();
   }
+
+
+  // ==========================================================
+  // RESULTS
+  // ==========================================================
 
   async function showResults() {
-    const { data, error } = await db
-      .from("votes")
-      .select("answer")
-      .eq("question_id", currentQuestion.id);
 
-    if (error) {
+    try {
+
+      const {
+        data,
+        error
+      } = await db
+
+        .from("votes")
+
+        .select("answer")
+
+        .eq(
+          "question_id",
+          currentQuestion.id
+        );
+
+
+      if (error) {
+
+        showOnly("errorView");
+
+        $("errorText").textContent =
+          "Results could not be loaded.";
+
+        diagnostic(
+          "Results error: " + error.message
+        );
+
+        return;
+
+      }
+
+
+      const a =
+        data.filter(
+          v => v.answer === "a"
+        ).length;
+
+
+      const b =
+        data.filter(
+          v => v.answer === "b"
+        ).length;
+
+
+      const total = a + b;
+
+
+      const ap =
+        total
+          ? Math.round(a / total * 100)
+          : 0;
+
+
+      const bp =
+        total
+          ? 100 - ap
+          : 0;
+
+
+      $("labelA").textContent =
+        currentQuestion.answer_a;
+
+      $("labelB").textContent =
+        currentQuestion.answer_b;
+
+
+      $("pctA").textContent =
+        `${ap}%`;
+
+      $("pctB").textContent =
+        `${bp}%`;
+
+
+      $("fillA").style.width =
+        `${ap}%`;
+
+      $("fillB").style.width =
+        `${bp}%`;
+
+
+      $("totalVotes").textContent =
+        `${total} vote${total === 1 ? "" : "s"}`;
+
+
+      $("funFact").textContent =
+        currentQuestion.fun_fact;
+
+
+      showOnly("resultView");
+
+
+      clearTimeout(resultTimer);
+
+
+      resultTimer =
+        setTimeout(() => {
+
+          loadToday();
+
+        }, 8000);
+
+
+    } catch (error) {
+
       showOnly("errorView");
-      $("errorText").textContent = error.message;
-      return;
+
+      $("errorText").textContent =
+        "Results could not be displayed.";
+
+      diagnostic(
+        "Results request failed: " +
+        (error.message || String(error))
+      );
+
     }
 
-    const a = data.filter(v => v.answer === "a").length;
-    const b = data.filter(v => v.answer === "b").length;
-    const total = a + b;
-    const ap = total ? Math.round(a/total*100) : 0;
-    const bp = total ? 100-ap : 0;
-
-    $("labelA").textContent = currentQuestion.answer_a;
-    $("labelB").textContent = currentQuestion.answer_b;
-    $("pctA").textContent = `${ap}%`;
-    $("pctB").textContent = `${bp}%`;
-    $("fillA").style.width = `${ap}%`;
-    $("fillB").style.width = `${bp}%`;
-    $("totalVotes").textContent = `${total} vote${total === 1 ? "" : "s"}`;
-    $("funFact").textContent = currentQuestion.fun_fact;
-
-    showOnly("resultView");
-
-    clearTimeout(resultTimer);
-    resultTimer = setTimeout(() => {
-      // Reload so a fresh voter gets the question again.
-      loadToday();
-    }, 8000);
   }
 
-  $("answerA").addEventListener("click", () => vote("a"));
-  $("answerB").addEventListener("click", () => vote("b"));
+
+  // ==========================================================
+  // BUTTONS
+  // ==========================================================
+
+  $("answerA").addEventListener(
+    "click",
+    () => vote("a")
+  );
+
+
+  $("answerB").addEventListener(
+    "click",
+    () => vote("b")
+  );
+
+
+  // ==========================================================
+  // START
+  // ==========================================================
 
   loadToday();
 
-  // If the TV stays on overnight, check for a new day's question.
+
+  // ==========================================================
+  // CHECK FOR NEW DAY
+  // ==========================================================
+
   setInterval(() => {
+
     loadToday();
+
   }, 60 * 1000);
+
+
 </script>
+
 </body>
 </html>
